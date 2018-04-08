@@ -47,13 +47,16 @@ class jStrip  extends EventEmitter {
   //***********************************************
   //***********************************************
   getData(data) {
- 
+
+    //console.log(arguments);
+
     if(this.o.dataRetrieved == false) {
       this.chkData(this.getData,data);
 
       this.subscribe('event1', data => {
         console.log(`Your name is: ${data.name}`);
       });
+      
       let t = setTimeout(() => {  //simulate http request async call
         this.emit('event1', {name: "ddddd"} );
         this.o.contents = 12;
@@ -110,13 +113,13 @@ class jStrip  extends EventEmitter {
     let that = this;
     this.o.forEach(function(x, i) {
       let patt1 = /\((.*)\)$/;
-
+      let patt2 = /(.*)\(.*\)\s*\{/
       //console.log(x)
 
-      if(patt1.test(x)) {
+      if(patt1.test(x) && patt2.test(x)) { //just check it is working first
+        
         let match1 = patt1.exec(x);     
-    
-        let match2 = /(.*)\(.*\)\s*\{/.exec(x);  //uses regex to find the function name, must be correct format!!
+        let match2 = patt2.exec(x);  //uses regex to find the function name, must be correct format!!
     
         let fn = (match2[(match2.length-1)]).trim();
         let arg = (match1[(match1.length-1)]).trim();
