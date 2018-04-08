@@ -1,4 +1,11 @@
 //chainingAsyncQeue
+const jsdom = require('jsdom');
+const {
+  JSDOM
+} = jsdom;
+//const prettyHtml = require('pretty');
+//const request = require("request");
+
 
 class EventEmitter {
   constructor() {
@@ -121,6 +128,26 @@ class jStrip extends EventEmitter {
   }
   //***********************************************
   //***********************************************
+  select(selector) {
+
+
+    if (this.o.dataRetrieved == false) {
+      this.chkData(this.select, selector);
+    } else {
+      const dom = (new JSDOM(this.o.contents));
+
+
+      if (typeof dom.window != "object") throw ("problem with dom")
+  
+      console.log(this.o.contents);
+
+      const $ = require('jquery')(dom.window);
+      this.o.contents = $(selector).html();
+    }
+    return this;
+  }
+  //***********************************************
+  //***********************************************
   add(data) {
 
     if (this.o.dataRetrieved == false) {
@@ -202,6 +229,6 @@ setInterval(() => {
 }, 1000);
 
 let d = new jStrip();
-d.getData('http://www.peace.com').add(1000).add(33).show().add(10).subtract(5).show();
+//d.getData('http://www.peace.com').select("*").add(1000).add(33).show().add(10).subtract(5).show();
 d.show();
 c.show().subtract(1).add(2).subtract(1);
