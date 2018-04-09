@@ -38,11 +38,12 @@ class jStrip extends EventEmitter {
   constructor() {
     super();
     
-    this.o = [];
+    //this.o = [];
+    this.o = new Map();
     this.o.dataRetrieved = false;
     this.o.contents = '';
     this.o.timeout = 10000;
-
+    
    /*  if(h && j) { 
       console.log("old v.1 stuff"); 
       this.oldjStrip(h, j);
@@ -51,7 +52,7 @@ class jStrip extends EventEmitter {
   }
 
   addToQueue(f, d) {
-    this.o.push(`${f}(${d})`);
+    this.o.set(f,d);
     return;
   }
   //***********************************************
@@ -62,7 +63,7 @@ class jStrip extends EventEmitter {
       this.addToQueue(this.getData, data);
 
       this.subscribe('event1', d => {   //subscribe 
-      //  console.log(`published data: ${d.data}`);
+        //console.log(`published data: ${d.data}`);
         this.o.contents = d.data;
         this.o.dataRetrieved = true;
         this.processQueue();
@@ -190,7 +191,8 @@ class jStrip extends EventEmitter {
   //***********************************************  
   processQueue() {
     let that = this;
-    this.o.forEach(function (x, i) {
+    for(let [fn,arg] of this.o.entries()) {
+   /*  //this.o.forEach(function (x, i) {
       let patt1 = /\((.*)\)$/;
       let patt2 = /(.*)\(.*\)\s*\{/
       //console.log(x)
@@ -202,17 +204,21 @@ class jStrip extends EventEmitter {
 
         let fn = (match2[(match2.length - 1)]).trim();
         let arg = (match1[(match1.length - 1)]).trim();
-
-        //console.log(i + '. match1 = ' + fn);
-        //console.log(i + '. match2 = ' + arg);
+ */
+        
 
         if (fn == 'getData') {
           arg = that.o.contents;
         }
 
-        that[fn].call(that,arg);
+     //   console.log('. fn = ' + fn);
+     //   console.log('. arg = ' + arg);
+
+        fn.call(that,arg)
+        //this[fn]("ss")
+      //  this[fn].call(that,arg);
       }
-    });
+   // });
   }
 
   async jStrip_(uri, jquery) {
