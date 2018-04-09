@@ -3,7 +3,7 @@ const jsdom = require('jsdom');
 const {  JSDOM } = jsdom;
 const $ = require("jquery")
 //const prettyHtml = require('pretty');
-//const request = require("request");
+const request = require("request");
 
 
 class EventEmitter {
@@ -37,10 +37,17 @@ class EventEmitter {
 class jStrip extends EventEmitter {
   constructor() {
     super();
+    
     this.o = [];
     this.o.dataRetrieved = false;
     this.o.contents = '';
     this.o.timeout = 10000;
+
+   /*  if(h && j) { 
+      console.log("old v.1 stuff"); 
+      this.oldjStrip(h, j);
+    }
+     */
   }
 
   addToQueue(f, d) {
@@ -122,12 +129,10 @@ class jStrip extends EventEmitter {
   }
   //***********************************************
   //***********************************************
-  select(selector) {
-
-    
+  selector(j) {
 
     if (this.o.dataRetrieved == false) {
-      this.addToQueue(this.select, selector);
+      this.addToQueue(this.selector, j);
     } else {
 
      // console.log("select(" + selector);
@@ -139,7 +144,7 @@ class jStrip extends EventEmitter {
      // console.log(this.o.contents);
 
       const $ = require('jquery')(dom.window);
-      this.o.contents = $(selector).html();
+      this.o.contents = $(j).html();
     }
     return this;
   }
@@ -209,17 +214,76 @@ class jStrip extends EventEmitter {
       }
     });
   }
+
+  async jStrip_(uri, jquery) {
+    try {
+      const options = {
+        url: uri,
+        timeout: this.o.timeout
+      };
+      const body = await this.oldjStripGet(options);
+      const data = await this.oldjStripJsdom(body[0], jquery);
+      return {
+        data,
+        timed: body[1],
+        uri,
+        jquery,
+        statuscode: body[2],
+      };
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  async oldjStripGet(url) { return new Promise((resolve, reject) => {
+      // console.log(`crawling ${url}`);
+      const start = Date.now();
+      request(url, (error, response, body) => {
+        if (error) reject(error);
+        resolve([body, (Date.now() - start), response && response.statusCode]);
+      });
+    });
+  }
+    async oldjStripJsdom(body, jquery)  {
+      const dom = await new JSDOM(body, {
+        runScripts: 'outside-only'
+      });
+      const window = await dom.window.document.defaultView;
+      const $ = await require('jquery')(window);
+      const rnd = await Math.floor((Math.random() * 1000) + 1);
+      await window.eval(`$('body').append('<jStrip id=\\'jStripSpecialTag${rnd}\\'>' + ${jquery}  + '</jStrip>');`);
+      const rtn = await $(`jStrip#jStripSpecialTag${rnd}`).html();
+      return rtn;
+    }
+  
+
 }
 
 
+//jStrip v.1 way (using Promise):
+let x = new jStrip();
 
+x.jStrip_('https://www.bing.com', "$('title').html()")
+.then((result) => {
+    console.log(`promise result: ${result.data}
+      time taken: ${result.timed}
+      uri: ${result.uri}
+      jquery: ${result.jquery}`);
+  })
+  .catch((e) => {
+    console.log(`Error: ${e}`);
+  });
 
+  console.log("some text, non blocked")
 
-let c = new jStrip();
+  //jStrip v.2 way - chaining:
+
+  let c = new jStrip();
 
 //c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
 //c.show().add(1).show();
-c.getData('http://www.google.com').select("#kk").show();
+
+c.getData('http://www.google.com').selector("#kk").show();
 
 setInterval(() => {
   console.log('non blocking');
