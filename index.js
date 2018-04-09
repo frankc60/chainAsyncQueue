@@ -48,7 +48,10 @@ class jStrip extends EventEmitter {
   }
 
   addToQueue(f, d) {
-    this.o.push([ [f], [d] ]);
+    this.o.push([
+      [f],
+      [d]
+    ]);
     return;
   }
   //***********************************************
@@ -76,42 +79,52 @@ class jStrip extends EventEmitter {
       if (urlRegex.test(data)) {
         //success
 
-        let t = setTimeout(() => { //simulate http request async call
-          let htmld = `
-      <!doctype html>
-      <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <title>Title</title>
-        <link rel="stylesheet" href="css/style.css?v=1.0">
-      </head>
-      <body>
-      
-      <h1>Welcome to My Homepage</h1>
-      <p class="intro">My name is Mickey.</p>
-      <p>I live in Duckburg.</p>
-      <p>My best friend is Mini.</p>
-      
-      <div id="kk">
-      Who is your favourite: hello there
-      <ul id="choose">
-          <li>Goofy</li>
-      <li>Mickey</li>
-        <li>Pluto</li>
-          <li>Mini</li>
-        
-      </ul>
-      </div>
-        <script type="text/javascript" src="js/script.js"></script>
-      </body>
-      </html>`;
 
+        request(options, (error, response, body) => {
+          if (error) reject(error);
+          console.log(response && response.statusCode);
           this.emit('dataReceived', {
-            data: htmld
+            data: body
           });
+        });
 
-       
-        }, 3000);
+
+        /*      let t = setTimeout(() => { //simulate http request async call
+               let htmld = `
+           <!doctype html>
+           <html lang="en">
+           <head>
+             <meta charset="utf-8">
+             <title>Title</title>
+             <link rel="stylesheet" href="css/style.css?v=1.0">
+           </head>
+           <body>
+           
+           <h1>Welcome to My Homepage</h1>
+           <p class="intro">My name is Mickey.</p>
+           <p>I live in Duckburg.</p>
+           <p>My best friend is Mini.</p>
+           
+           <div id="kk">
+           Who is your favourite: hello there
+           <ul id="choose">
+               <li>Goofy</li>
+           <li>Mickey</li>
+             <li>Pluto</li>
+               <li>Mini</li>
+             
+           </ul>
+           </div>
+             <script type="text/javascript" src="js/script.js"></script>
+           </body>
+           </html>`;
+
+               this.emit('dataReceived', {
+                 data: htmld
+               });
+
+            
+             }, 3000); */
 
       } else {
 
@@ -328,7 +341,7 @@ let c = new jStrip();
 //c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
 //c.show().add(1).show();
 
-c.getData('http://www.google.com').marker("marker1").selector("#kk").marker("marker2").selector("#choose").marker("marker3")
+c.getData('https://www.timeanddate.com/worldclock/fullscreen.html?n=264').selector("div#rs1").marker("marker2").selector("#i_time").marker("marker3")
 c.pretty(true).show()
 
 
