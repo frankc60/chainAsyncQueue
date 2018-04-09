@@ -3,11 +3,13 @@ const jsdom = require('jsdom');
 const {
   JSDOM
 } = jsdom;
-const $ = require("jquery")
+//const $ = require("jquery")
 const prettyHtml = require('pretty');
 const request = require("request");
 
-
+//*******************************************************************************************
+//*******************************************************************************************
+//*******************************************************************************************
 class EventEmitter {
   constructor() {
     this.events = {};
@@ -46,7 +48,8 @@ class jStrip extends EventEmitter {
     this.o.timeout = 10000;
 
   }
-
+  //***********************************************
+  //***********************************************
   addToQueue(f, d) {
     this.o.push([
       [f],
@@ -61,8 +64,7 @@ class jStrip extends EventEmitter {
     if (this.o.dataRetrieved == false) {
       this.addToQueue(this.getData, data);
 
-      this.on('dataReceived', d => { //on 
-        //console.log(`published data: ${d.data}`);
+      this.on('dataReceived', d => {
         this.o.contents = d.data;
         this.o.dataRetrieved = true;
         this.processQueue();
@@ -75,67 +77,20 @@ class jStrip extends EventEmitter {
 
       let urlRegex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
 
-
       if (urlRegex.test(data)) {
         //success
-
-
         request(options, (error, response, body) => {
-          if (error) reject(error);
-          console.log(response && response.statusCode);
+          if (error) reject(error + response && response.statusCode);
           this.emit('dataReceived', {
             data: body
           });
         });
-
-
-        /*      let t = setTimeout(() => { //simulate http request async call
-               let htmld = `
-           <!doctype html>
-           <html lang="en">
-           <head>
-             <meta charset="utf-8">
-             <title>Title</title>
-             <link rel="stylesheet" href="css/style.css?v=1.0">
-           </head>
-           <body>
-           
-           <h1>Welcome to My Homepage</h1>
-           <p class="intro">My name is Mickey.</p>
-           <p>I live in Duckburg.</p>
-           <p>My best friend is Mini.</p>
-           
-           <div id="kk">
-           Who is your favourite: hello there
-           <ul id="choose">
-               <li>Goofy</li>
-           <li>Mickey</li>
-             <li>Pluto</li>
-               <li>Mini</li>
-             
-           </ul>
-           </div>
-             <script type="text/javascript" src="js/script.js"></script>
-           </body>
-           </html>`;
-
-               this.emit('dataReceived', {
-                 data: htmld
-               });
-
-            
-             }, 3000); */
-
-      } else {
-
+      } else { //not a url
         this.emit('dataReceived', {
           data: data
         });
       }
-
     }
-
-    //console.log('getData output ' + data);
     return this;
   }
   //***********************************************
@@ -160,49 +115,18 @@ class jStrip extends EventEmitter {
     return this;
   }
   //***********************************************
-  //***********************************************
-  add(data) {
-
-    if (this.o.dataRetrieved == false) {
-      this.addToQueue(this.add, data);
-    } else {
-      let output = (parseInt(this.o.contents) + parseInt(data));
-
-      console.log('add output: ' + this.o.contents + ' + ' + data + ' = ' + output);
-      this.o.contents = parseInt(this.o.contents) + parseInt(data);
-    }
-    return this;
-  }
-  //***********************************************
-  //***********************************************
-  subtract(data) {
-
-    if (this.o.dataRetrieved == false) {
-      this.addToQueue(this.subtract, data);
-    } else {
-      let output = (parseInt(this.o.contents) - parseInt(data));
-
-      console.log('subtract output: ' + this.o.contents + ' - ' + data + ' = ' + output);
-      this.o.contents = parseInt(this.o.contents) - parseInt(data);
-    }
-    return this;
-  }
-  //***********************************************
   //***********************************************  
   show(a) {
-
     if (this.o.dataRetrieved == false) {
       this.addToQueue(this.show, a);
     } else {
-      console.log("show: " + this.o.contents);
+      console.log(this.o.contents);
     }
     return this;
-
   }
   //***********************************************
   //***********************************************  
   marker(a) {
-
     if (this.o.dataRetrieved == false) {
       this.addToQueue(this.marker, a);
     } else {
@@ -210,11 +134,8 @@ class jStrip extends EventEmitter {
       this.emit(a, {
         data: this.o.contents
       });
-
-
     }
     return this;
-
   }
   //***********************************************
   //*********************************************** 
@@ -229,7 +150,7 @@ class jStrip extends EventEmitter {
   }
   //***********************************************
   //***********************************************  
-  pretty(bol) {
+  pretty(bol = true) {
     if (this.o.dataRetrieved == false) {
       this.addToQueue(this.pretty, bol);
     } else {
@@ -244,25 +165,12 @@ class jStrip extends EventEmitter {
   //***********************************************  
   processQueue() {
     let that = this;
-    //console.log("size:" + this.o.length)
-    for (let [f, a] of this.o) { //.entries()
-      //this.o.forEach(function (x, i) {
-      // console.log(x,i)
-      //  console.log(f[0].toString())
-      //  let patt1 = /Function\:.*(.+)/;
-      //  let patt2 = /(.*)\(.*\)\s*\{/
-
-      let arg = a;
-      //  console.log(arg)
-      if (f[0].toString() == 'getData') {
-        arg = that.o.contents;
-      }
-
+    for (let [f, arg] of this.o) { //.entries()
       f[0].apply(that, arg);
-
     };
   }
-
+  //***********************************************
+  //***********************************************  
   async jStrip_(uri, jquery) {
     try {
       const options = {
@@ -282,7 +190,8 @@ class jStrip extends EventEmitter {
       throw err;
     }
   };
-
+  //***********************************************
+  //***********************************************  
   async oldjStripGet(url) {
     return new Promise((resolve, reject) => {
       // console.log(`crawling ${url}`);
@@ -293,6 +202,8 @@ class jStrip extends EventEmitter {
       });
     });
   }
+  //***********************************************
+  //***********************************************  
   async oldjStripJsdom(body, jquery) {
     const dom = await new JSDOM(body, {
       runScripts: 'outside-only'
@@ -304,6 +215,8 @@ class jStrip extends EventEmitter {
     const rtn = await $(`jStrip#jStripSpecialTag${rnd}`).html();
     return rtn;
   }
+  //***********************************************
+  //***********************************************  
 
 
 }
@@ -311,65 +224,4 @@ class jStrip extends EventEmitter {
 
 
 
-
-
-
-
-
-
-
-//jStrip v.1 way (using Promise):
-let x = new jStrip();
-
-x.jStrip_('https://www.bing.com', "$('title').html()")
-  .then((result) => {
-    console.log(`promise result: ${result.data}
-      time taken: ${result.timed}
-      uri: ${result.uri}
-      jquery: ${result.jquery}`);
-  })
-  .catch((e) => {
-    console.log(`Error: ${e}`);
-  });
-
-console.log("some text, non blocked")
-
-//jStrip v.2 way - chaining:
-
-let c = new jStrip();
-
-//c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
-//c.show().add(1).show();
-
-c.getData('https://www.timeanddate.com/worldclock/fullscreen.html?n=264').selector("div#rs1").marker("marker2").selector("#i_time").marker("marker3")
-c.pretty(true).show()
-
-
-
-
-c.on("marker1", (a) => {
-  console.log("marker1: .on(data) = " + a.data);
-})
-
-
-c.on("marker2", (a) => {
-  console.log("marker2: .on(data) = " + a.data);
-})
-
-c.on("marker3", (a) => {
-  console.log("marker3: .on(data) = " + a.data);
-})
-
-
-setInterval(() => {
-  console.log('non blocking');
-}, 1000);
-
-let d = new jStrip();
-
-d.getData("hello     world"); //if not url, then data is used as the original contents.
-
-d.show().replace(/hello/, "hi").show();
-//c.show().subtract(1).add(2).subtract(1);
-let e = new jStrip();
-e.getData(55).add(5).subtract(30).show();
+module.exports = jStrip;
