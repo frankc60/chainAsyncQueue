@@ -44,9 +44,9 @@ class jStrip extends EventEmitter {
     this.o.timeout = 10000;
   }
 
-  chkData(f, d) {
+  addToQueue(f, d) {
     let k = `${f}(${d})`;
-    if (typeof d == 'string') {
+    if (typeof d == 'string') { //do i need this still ?
       k = `${f}("${d}")`;
     }
     this.o.push(k);
@@ -56,9 +56,8 @@ class jStrip extends EventEmitter {
   //***********************************************
   getData(data) {
 
-
     if (this.o.dataRetrieved == false) {
-      this.chkData(this.getData, data);
+      this.addToQueue(this.getData, data);
 
       this.subscribe('event1', d => {   //subscribe 
         console.log(`published data: ${d.data}`);
@@ -123,7 +122,7 @@ class jStrip extends EventEmitter {
       }, 3000);
     }
 
-    console.log('getData output ' + data);
+    //console.log('getData output ' + data);
     return this;
   }
   //***********************************************
@@ -132,7 +131,7 @@ class jStrip extends EventEmitter {
 
 
     if (this.o.dataRetrieved == false) {
-      this.chkData(this.select, selector);
+      this.addToQueue(this.select, selector);
     } else {
       const dom = (new JSDOM(this.o.contents));
 
@@ -151,7 +150,7 @@ class jStrip extends EventEmitter {
   add(data) {
 
     if (this.o.dataRetrieved == false) {
-      this.chkData(this.add, data);
+      this.addToQueue(this.add, data);
     } else {
       let output = (parseInt(this.o.contents) + parseInt(data));
 
@@ -165,11 +164,11 @@ class jStrip extends EventEmitter {
   subtract(data) {
 
     if (this.o.dataRetrieved == false) {
-      this.chkData(this.subtract, data);
+      this.addToQueue(this.subtract, data);
     } else {
       let output = (parseInt(this.o.contents) - parseInt(data));
 
-      console.log('add output: ' + this.o.contents + ' - ' + data + ' = ' + output);
+      console.log('subtract output: ' + this.o.contents + ' - ' + data + ' = ' + output);
       this.o.contents = parseInt(this.o.contents) - parseInt(data);
     }
     return this;
@@ -178,9 +177,9 @@ class jStrip extends EventEmitter {
   //***********************************************  
   show(a) {
     if (this.o.dataRetrieved == false) {
-      this.chkData(this.show, a);
+      this.addToQueue(this.show, a);
     } else {
-      console.log(this.o.contents);
+      console.log("show: " + this.o.contents);
     }
     return this;
   }
@@ -208,7 +207,7 @@ class jStrip extends EventEmitter {
           arg = that.o.contents;
         }
 
-        that[fn](arg);
+        that[fn].call(that,arg);
       }
     });
   }
@@ -220,9 +219,9 @@ class jStrip extends EventEmitter {
 
 let c = new jStrip();
 
-c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
-c.show().add(1).show();
-
+//c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
+//c.show().add(1).show();
+c.getData('http://www.google.com').show();
 
 setInterval(() => {
   console.log('non blocking');
@@ -231,4 +230,4 @@ setInterval(() => {
 let d = new jStrip();
 //d.getData('http://www.peace.com').select("*").add(1000).add(33).show().add(10).subtract(5).show();
 d.show();
-c.show().subtract(1).add(2).subtract(1);
+//c.show().subtract(1).add(2).subtract(1);
