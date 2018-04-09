@@ -1,8 +1,7 @@
 //chainingAsyncQeue
 const jsdom = require('jsdom');
-const {
-  JSDOM
-} = jsdom;
+const {  JSDOM } = jsdom;
+const $ = require("jquery")
 //const prettyHtml = require('pretty');
 //const request = require("request");
 
@@ -45,11 +44,7 @@ class jStrip extends EventEmitter {
   }
 
   addToQueue(f, d) {
-    let k = `${f}(${d})`;
-    if (typeof d == 'string') { //do i need this still ?
-      k = `${f}("${d}")`;
-    }
-    this.o.push(k);
+    this.o.push(`${f}(${d})`);
     return;
   }
   //***********************************************
@@ -60,7 +55,7 @@ class jStrip extends EventEmitter {
       this.addToQueue(this.getData, data);
 
       this.subscribe('event1', d => {   //subscribe 
-        console.log(`published data: ${d.data}`);
+      //  console.log(`published data: ${d.data}`);
         this.o.contents = d.data;
         this.o.dataRetrieved = true;
         this.processQueue();
@@ -113,7 +108,7 @@ class jStrip extends EventEmitter {
         </html>`;
 
         this.emit('event1', {
-          data: 12
+          data: htmld
         });
         
         //this.o.dataRetrieved = true;
@@ -129,16 +124,19 @@ class jStrip extends EventEmitter {
   //***********************************************
   select(selector) {
 
+    
 
     if (this.o.dataRetrieved == false) {
       this.addToQueue(this.select, selector);
     } else {
+
+     // console.log("select(" + selector);
       const dom = (new JSDOM(this.o.contents));
 
 
       if (typeof dom.window != "object") throw ("problem with dom")
   
-      console.log(this.o.contents);
+     // console.log(this.o.contents);
 
       const $ = require('jquery')(dom.window);
       this.o.contents = $(selector).html();
@@ -221,7 +219,7 @@ let c = new jStrip();
 
 //c.getData('http://www.google.com').add(2).subtract(3).show().add(10).subtract(5).show();
 //c.show().add(1).show();
-c.getData('http://www.google.com').show();
+c.getData('http://www.google.com').select("#kk").show();
 
 setInterval(() => {
   console.log('non blocking');
