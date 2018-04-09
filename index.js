@@ -135,7 +135,7 @@ class jStrip extends EventEmitter {
       this.addToQueue(this.selector, j);
     } else {
 
-     // console.log("select(" + selector);
+     // console.log("select(" + selector + ")");
       const dom = (new JSDOM(this.o.contents));
 
 
