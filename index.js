@@ -62,7 +62,7 @@ class jStrip extends EventEmitter {
   getData(data) {
 
     if (this.o.dataRetrieved == false) {
-      this.addToQueue(this.getData, data);
+     // this.addToQueue(this.getData, data);
 
       this.on('dataReceived', d => {
         this.o.contents = d.data;
@@ -165,8 +165,16 @@ class jStrip extends EventEmitter {
   //***********************************************  
   processQueue() {
     let that = this;
-    for (let [f, arg] of this.o) { //.entries()
-      f[0].apply(that, arg);
+    let remove;
+    let r = this.o;
+    for (let [fn, arg] of r) { //.entries()
+//console.log(i + "-" + farg[0])
+//console.log("****" + r.indexOf(1))
+    //  let fn = farg[0].toString();
+      fn[0].apply(that,arg)
+      //.apply(that, farg[1]);
+      //console.log(i)
+      //remove = this.o.splice(x,1);
     };
   }
   //***********************************************
