@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/frankc60/chainAsyncQueue#readme",
   "dependencies": {
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "jsdom": "^11.7.0",
     "pretty": "^2.0.0"
   }
